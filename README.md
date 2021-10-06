@@ -1,0 +1,1 @@
+# my-symptoms-converter
