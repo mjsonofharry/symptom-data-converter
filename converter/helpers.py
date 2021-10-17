@@ -80,8 +80,8 @@ def time_elapsed():
 
     @generate
     def p():
-        hours = yield (number(2) ^ number(1)) << string(":")
-        minutes = yield number(2)
+        hours = yield number() << string(":")
+        minutes = yield number()
         return timedelta(hours=hours, minutes=minutes)
 
     return p
@@ -91,14 +91,17 @@ none = lambda _: None
 
 
 def optional(p: Parser):
+    """Parse something if it exists or else yield none."""
     return p ^ empty().parsecmap(none)
 
 
 def maybe_more():
+    """Parse the next delimiter if it exists."""
     return optional(delimiter()).parsecmap(none)
 
 
 def key_value(key: str, p: Parser):
+    """Parse something in the format of KEY:VALUE."""
     return string(key) >> string(":") >> spaces() >> p
 
 

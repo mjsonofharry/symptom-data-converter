@@ -18,7 +18,7 @@ class Symptom:
         @generate
         def p():
             name = yield until_delimiter()
-            intensity = yield key_value("Intensity", number()) << optional(delimiter())
+            intensity = yield key_value("Intensity", number()) << maybe_more()
             duration = (
                 yield optional(key_value("Duration", time_elapsed())) << maybe_more()
             )
