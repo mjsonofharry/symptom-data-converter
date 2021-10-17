@@ -55,11 +55,6 @@ def bracketed():
     return string("[") >> regex(r"[^\]]+") << string("]")
 
 
-def event_notes():
-    """Parse notes."""
-    return string('"Notes:') >> spaces() >> regex(r'[^\\"]+') << string('"')
-
-
 def delimited_sequence(p: Parser):
     """Parse a sequence of delimited parsers until the end of the string."""
     return many1(p << (delimiter() ^ end_of_string()))
@@ -80,12 +75,12 @@ def date_and_time():
     return p
 
 
-def duration():
+def time_elapsed():
     """Parse a duration in the format of "HH:MM"."""
 
     @generate
     def p():
-        hours = yield number(2) << string(":")
+        hours = yield (number(2) ^ number(1)) << string(":")
         minutes = yield number(2)
         return timedelta(hours=hours, minutes=minutes)
 
@@ -101,3 +96,12 @@ def optional(p: Parser):
 
 def maybe_more():
     return optional(delimiter()).parsecmap(none)
+
+
+def key_value(key: str, p: Parser):
+    return string(key) >> string(":") >> spaces() >> p
+
+
+def event_notes():
+    """Parse notes."""
+    return string('"Notes:') >> spaces() >> regex(r'[^\\"]+') << string('"')

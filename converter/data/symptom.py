@@ -7,27 +7,21 @@ from parsec import *
 from converter.helpers import *
 
 
-def symptom_intensity():
-    return string("Intensity:") >> spaces() >> number()
-
-
-def symptom_duration():
-    return string("Duration:") >> spaces() >> duration()
-
-
 @dataclass(frozen=True)
 class Symptom:
     name: str
     intensity: int
-    duration: int
+    duration: timedelta
 
     @classmethod
     def Parser(cls) -> Parser:
         @generate
         def p():
             name = yield until_delimiter()
-            intensity = yield symptom_intensity() << maybe_more()
-            duration = yield optional(symptom_duration()) << maybe_more()
+            intensity = yield key_value("Intensity", number()) << optional(delimiter())
+            duration = (
+                yield optional(key_value("Duration", time_elapsed())) << maybe_more()
+            )
             return Symptom(
                 name=name,
                 intensity=intensity,
@@ -49,7 +43,7 @@ class SymptomData(EventData):
     def Parser(cls) -> Parser:
         @generate
         def p():
-            symptoms = yield many1(Symptom.Parser() << optional(delimiter()))
+            symptoms = yield many1(Symptom.Parser())
             notes = yield optional(event_notes())
             return SymptomData(symptoms=symptoms, notes=notes)
 

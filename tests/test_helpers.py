@@ -15,10 +15,10 @@ def test_date_and_time():
     assert p.parse("12/21/2021, 11:30") == datetime(year=2021, month=12, day=21, hour=11, minute=30)
 
 
-def test_duration():
+def test_time_elapsed():
     @generate
     def p():
-        result = yield duration()
+        result = yield time_elapsed()
         return result
     
     assert p.parse("21:45") == timedelta(hours=21, minutes=45)
