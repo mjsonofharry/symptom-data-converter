@@ -2,10 +2,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Type
 
-from data import EventData, SymptomData, BowelMovementData
+from converter.data.base import EventData
+from converter.data.symptom import SymptomData
+from converter.data.bm import BowelMovementData
 
 from parsec import *
-from helpers import *
+from converter.helpers import *
 
 @dataclass(frozen=True)
 class Event:

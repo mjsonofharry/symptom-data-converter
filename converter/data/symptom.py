@@ -1,18 +1,14 @@
 from dataclasses import dataclass
 from typing import List
 
-from data import EventData
+from data.base import EventData
 
 from parsec import *
-from helpers import *
+from converter.helpers import *
 
 
 def symptom_intensity():
-    return (
-        (string("Intensity:") >> spaces() >> many1(digit()))
-        .parsecmap("".join)
-        .parsecmap(int)
-    )
+    return string("Intensity:") >> spaces() >> number()
 
 
 def symptom_duration():
@@ -29,11 +25,9 @@ class Symptom:
     def Parser(cls) -> Parser:
         @generate
         def p():
-            name = yield until_delimiter() << spaces()
-            intensity = yield symptom_intensity() << delimiter() << spaces()
-            duration = yield symptom_duration() ^ (
-                empty() ^ (delimiter() + spaces())
-            ).parsecmap(none)
+            name = yield until_delimiter()
+            intensity = yield symptom_intensity() << maybe_more()
+            duration = yield optional(symptom_duration()) << maybe_more()
             return Symptom(
                 name=name,
                 intensity=intensity,
@@ -55,8 +49,8 @@ class SymptomData(EventData):
     def Parser(cls) -> Parser:
         @generate
         def p():
-            symptoms = yield many1(Symptom.Parser() << (delimiter() ^ string("")))
-            notes = yield event_notes() ^ empty().parsecmap(none)
+            symptoms = yield many1(Symptom.Parser() << optional(delimiter()))
+            notes = yield optional(event_notes())
             return SymptomData(symptoms=symptoms, notes=notes)
 
         return p

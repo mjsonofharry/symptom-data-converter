@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from typing import List, Tuple, Optional
 
-from data import EventData
+from data.base import EventData
 
 from parsec import *
-from helpers import *
+from converter.helpers import *
 
 
 def ingredient_with_quantity():

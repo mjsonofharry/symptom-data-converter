@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from typing import List
 
-from data import EventData
+from data.base import EventData
 
 from parsec import *
-from helpers import *
+from converter.helpers import *
 
 
 def exercises_with_notes():

@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+import dataclasses
 
 from event import Event
 
@@ -12,14 +13,14 @@ def main():
     input_path: str = args.input
     output_path: str = args.output
 
-    with open(input_path, 'r') as fin, open(output_path, 'w') as fout:
+    with open(input_path, "r") as fin, open(output_path, "w") as fout:
         for row in fin.readlines():
             event = Event.parse(data=row)
             if not event:
                 continue
             # fout.write(event)
             # fout.write("\n")
-            print(event.data)
+            print(dataclasses.asdict(event))
 
 
 if __name__ == "__main__":

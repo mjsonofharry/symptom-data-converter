@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Optional
 
 from parsec import *
 
@@ -37,9 +38,11 @@ def until_end_of_line():
     return regex(r"[^\n]+")
 
 
-def number(digits: int):
-    """Parse a positive integer with a fixed length."""
-    return count(digit(), digits).parsecmap(lambda characters: int("".join(characters)))
+def number(digits: Optional[int] = None):
+    """Parse a positive integer."""
+    if not digits:
+        return many1(digit()).parsecmap("".join).parsecmap(int)
+    return count(digit(), digits).parsecmap("".join).parsecmap(int)
 
 
 def quoted():
@@ -71,7 +74,7 @@ def date_and_time():
         day = yield number(2) << string("/")
         year = yield number(4) << delimiter()
         hour = yield number(2) << string(":")
-        minute = yield number(2) << delimiter()
+        minute = yield number(2) << optional(delimiter())
         return datetime(year=year, month=month, day=day, hour=hour, minute=minute)
 
     return p
@@ -90,3 +93,11 @@ def duration():
 
 
 none = lambda _: None
+
+
+def optional(p: Parser):
+    return p ^ empty().parsecmap(none)
+
+
+def maybe_more():
+    return optional(delimiter()).parsecmap(none)
