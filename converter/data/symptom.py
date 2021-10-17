@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from event import EventData
+from data import EventData
 
 from parsec import *
 from helpers import *
@@ -25,7 +25,6 @@ class Symptom:
     intensity: int
     duration: int
 
-    @property
     @classmethod
     def Parser(cls) -> Parser:
         @generate
@@ -41,7 +40,7 @@ class Symptom:
 
     @classmethod
     def parse(cls, data: str) -> "Symptom":
-        return cls.Parser.parse(data=data)
+        return cls.Parser().parse(text=data)
 
 
 def symptoms_with_notes():
@@ -67,7 +66,6 @@ def symptoms_without_notes():
 class SymptomData(EventData):
     symptoms: List[Symptom]
 
-    @property
     @classmethod
     def Parser(cls) -> Parser:
         @generate
@@ -79,4 +77,4 @@ class SymptomData(EventData):
 
     @classmethod
     def parse(cls, data: str) -> "SymptomData":
-        return cls.Parser.parse(data=data)
+        return cls.Parser().parse(text=data)

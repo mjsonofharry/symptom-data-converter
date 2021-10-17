@@ -131,6 +131,7 @@ dmypy.json
 # Data
 *.csv
 *.mp4
+*.txt
 
 # MacOS
 .DS_Store

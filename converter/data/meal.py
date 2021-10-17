@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Tuple, Optional
 
-from event import EventData
+from data import EventData
 
 from parsec import *
 from helpers import *
@@ -49,7 +49,6 @@ def ingredients_without_notes():
 class MealData(EventData):
     ingredients: List[Tuple[str, Optional[str]]]
 
-    @property
     @classmethod
     def Parser(cls) -> Parser:
         @generate
@@ -63,4 +62,4 @@ class MealData(EventData):
 
     @classmethod
     def parse(cls, data: str) -> "MealData":
-        return cls.Parser.parse(data=data)
+        return cls.Parser().parse(text=data)

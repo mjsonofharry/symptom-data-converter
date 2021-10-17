@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from event import EventData
+from data import EventData
 
 
 @dataclass(frozen=True)

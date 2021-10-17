@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from event import EventData
+from data import EventData
 
 from parsec import *
 from helpers import *
@@ -30,7 +30,6 @@ def exercises_without_notes():
 class ExerciseData(EventData):
     exercises: List[str]
 
-    @property
     @classmethod
     def Parser(cls) -> Parser:
         @generate
@@ -42,4 +41,4 @@ class ExerciseData(EventData):
 
     @classmethod
     def parse(cls, data: str) -> "ExerciseData":
-        return cls.Parser.parse(data=data)
+        return cls.Parser().parse(text=data)
