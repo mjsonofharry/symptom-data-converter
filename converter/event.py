@@ -14,14 +14,14 @@ from helpers import *
 class Event:
     timestamp: datetime
     kind: str
-    data: EventData
+    data: Optional[EventData]
 
     @staticmethod
     def kind_to_subclass(kind: str) -> Optional[Type["EventData"]]:
         return {
             "Symptom": SymptomData,
             "Bowel Movement": BowelMovementData,
-        }.get(kind)
+        }.get(kind, EventData)
 
     @classmethod
     def Parser(cls) -> Parser:
@@ -33,7 +33,7 @@ class Event:
             event_data_cls = Event.kind_to_subclass(kind)
             if not event_data_cls:
                 return None
-            data = event_data_cls.parse(data=event_data)
+            data = event_data_cls.parse(data=event_data) if event_data else None
             return cls(timestamp=timestamp, kind=kind, data=data)
 
         return p

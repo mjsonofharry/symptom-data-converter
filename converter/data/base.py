@@ -11,8 +11,13 @@ class EventData:
 
     @classmethod
     def Parser(cls) -> Parser:
-        raise NotImplementedError()
+        @generate
+        def p():
+            _ = yield optional(many(until_delimiter()))
+            notes = yield optional(event_notes())
+            return cls(notes=notes)
+        return p
 
     @classmethod
     def parse(cls, data: str) -> Type["EventData"]:
-        raise NotImplementedError()
+        return cls.Parser().parse(text=data)

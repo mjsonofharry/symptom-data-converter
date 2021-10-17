@@ -24,7 +24,6 @@ def main():
                 continue
             # fout.write(event)
             # fout.write("\n")
-            print(dataclasses.asdict(event))
 
 
 if __name__ == "__main__":
