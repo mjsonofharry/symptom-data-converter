@@ -13,6 +13,7 @@ def ingredient_with_quantity():
         ingredient = yield quoted() << delimiter()
         quantity = yield string('"') >> bracketed() << string('"')
         return (ingredient, quantity)
+
     return p
 
 
@@ -21,6 +22,7 @@ def ingredient_without_quantity():
     def p():
         ingredient = yield quoted()
         return (ingredient, None)
+
     return p
 
 
@@ -34,6 +36,7 @@ def ingredients_with_notes():
         ingredients = yield many1(ingredient() << delimiter())
         notes = yield event_notes() << end_of_string()
         return (ingredients, notes)
+
     return p
 
 
@@ -42,6 +45,7 @@ def ingredients_without_notes():
     def p():
         ingredients = yield delimited_sequence(ingredient())
         return (ingredients, None)
+
     return p
 
 

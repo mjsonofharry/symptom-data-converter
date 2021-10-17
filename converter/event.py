@@ -9,6 +9,7 @@ from converter.data.bm import BowelMovementData
 from parsec import *
 from converter.helpers import *
 
+
 @dataclass(frozen=True)
 class Event:
     timestamp: datetime

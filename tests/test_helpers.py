@@ -12,7 +12,9 @@ def test_date_and_time():
         result = yield date_and_time()
         return result
 
-    assert p.parse("12/21/2021, 11:30") == datetime(year=2021, month=12, day=21, hour=11, minute=30)
+    assert p.parse("12/21/2021, 11:30") == datetime(
+        year=2021, month=12, day=21, hour=11, minute=30
+    )
 
 
 def test_time_elapsed():
@@ -20,7 +22,7 @@ def test_time_elapsed():
     def p():
         result = yield time_elapsed()
         return result
-    
+
     assert p.parse("21:45") == timedelta(hours=21, minutes=45)
 
 

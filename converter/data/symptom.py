@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from data.base import EventData
+from converter.data.base import EventData
 
 from parsec import *
 from converter.helpers import *
@@ -45,7 +45,7 @@ class SymptomData(EventData):
         def p():
             symptoms = yield many1(Symptom.Parser())
             notes = yield optional(event_notes())
-            return SymptomData(symptoms=symptoms, notes=notes)
+            return cls(symptoms=symptoms, notes=notes)
 
         return p
 
