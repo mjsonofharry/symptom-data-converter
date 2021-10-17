@@ -30,36 +30,21 @@ class Symptom:
         @generate
         def p():
             name = yield until_delimiter() << spaces()
-            intensity = yield symptom_intensity()
-            duration = yield (delimiter() << spaces() << symptom_duration()) ^ (
-                end_of_string() ^ (delimiter() + spaces())
-            ).parsecmap(lambda x: None)
-            return Symptom(name=name, intensity=intensity, duration=duration)
+            intensity = yield symptom_intensity() << delimiter() << spaces()
+            duration = yield symptom_duration() ^ (
+                empty() ^ (delimiter() + spaces())
+            ).parsecmap(none)
+            return Symptom(
+                name=name,
+                intensity=intensity,
+                duration=duration,
+            )
 
         return p
 
     @classmethod
     def parse(cls, data: str) -> "Symptom":
         return cls.Parser().parse(text=data)
-
-
-def symptoms_with_notes():
-    @generate
-    def p():
-        symptom = yield many1(Symptom.Parser() << delimiter())
-        notes = yield event_notes() << end_of_string()
-        return (symptom, notes)
-
-    return p
-
-
-def symptoms_without_notes():
-    @generate
-    def p():
-        symptoms = yield many1(Symptom.Parser())
-        return (symptoms, None)
-
-    return p
 
 
 @dataclass(frozen=True)
@@ -70,7 +55,8 @@ class SymptomData(EventData):
     def Parser(cls) -> Parser:
         @generate
         def p():
-            symptoms, notes = yield symptoms_with_notes() ^ symptoms_without_notes()
+            symptoms = yield many1(Symptom.Parser() << (delimiter() ^ string("")))
+            notes = yield event_notes() ^ empty().parsecmap(none)
             return SymptomData(symptoms=symptoms, notes=notes)
 
         return p

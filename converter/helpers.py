@@ -27,6 +27,11 @@ def end_of_line():
     return regex(r"[\n]")
 
 
+def empty():
+    """Parse empty string."""
+    return string("") ^ end_of_string() ^ end_of_line()
+
+
 def until_end_of_line():
     """Parse text the end of a line."""
     return regex(r"[^\n]+")
@@ -59,6 +64,7 @@ def delimited_sequence(p: Parser):
 
 def date_and_time():
     """Parse a date and time in the format of "MM/DD/YYYY, HH:MM"."""
+
     @generate
     def p():
         month = yield number(2) << string("/")
@@ -73,6 +79,7 @@ def date_and_time():
 
 def duration():
     """Parse a duration in the format of "HH:MM"."""
+
     @generate
     def p():
         hours = yield number(2) << string(":")
@@ -82,5 +89,4 @@ def duration():
     return p
 
 
-
-
+none = lambda _: None
