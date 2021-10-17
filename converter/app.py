@@ -15,6 +15,10 @@ def main():
 
     with open(input_path, "r") as fin, open(output_path, "w") as fout:
         for row in fin.readlines():
+            row = row.strip()
+            if not row:
+                continue
+            print(row)
             event = Event.parse(data=row)
             if not event:
                 continue

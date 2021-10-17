@@ -2,12 +2,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Type
 
-from converter.data.base import EventData
-from converter.data.symptom import SymptomData
-from converter.data.bm import BowelMovementData
+from data.base import EventData
+from data.symptom import SymptomData
+from data.bm import BowelMovementData
 
 from parsec import *
-from converter.helpers import *
+from helpers import *
 
 
 @dataclass(frozen=True)
@@ -28,8 +28,8 @@ class Event:
         @generate
         def p():
             timestamp = yield date_and_time()
-            kind = yield until_delimiter()
-            event_data = yield until_end_of_line()
+            kind = yield until_delimiter() ^ until_end_of_line()
+            event_data = yield optional(until_end_of_line())
             event_data_cls = Event.kind_to_subclass(kind)
             if not event_data_cls:
                 return None

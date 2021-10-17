@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from typing import List
 
-from converter.data.base import EventData
+from data.base import EventData
 
 from parsec import *
-from converter.helpers import *
+from helpers import *
 
 
 @dataclass(frozen=True)

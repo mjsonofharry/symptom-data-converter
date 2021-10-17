@@ -2,8 +2,8 @@ import pytest
 
 from datetime import datetime, timedelta
 
-from converter.event import Event
-from converter.data.symptom import SymptomData
+from event import Event
+from data.symptom import SymptomData
 
 
 def test_minimal():

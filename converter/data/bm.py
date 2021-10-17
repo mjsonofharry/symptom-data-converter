@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
-from converter.data.base import EventData
+from data.base import EventData
 
 from parsec import *
-from converter.helpers import *
+from helpers import *
 
 
 @dataclass(frozen=True)
@@ -14,8 +14,8 @@ class BowelMovementData(EventData):
     def Parser(cls) -> Parser:
         @generate
         def p():
-            _ = yield string("Bowel Movement") << delimiter()
-            intensity = yield key_value("Intensity", number()) << maybe_more()
+            _ = yield string("Bowel Movement") << maybe_more()
+            intensity = yield optional(key_value("Intensity", number())) << maybe_more()
             notes = yield optional(event_notes())
             return cls(intensity=intensity, notes=notes)
 

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional, Type
 
 from parsec import *
-from converter.helpers import *
+from helpers import *
 
 
 @dataclass(frozen=True)

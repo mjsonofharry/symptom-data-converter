@@ -2,8 +2,8 @@ import pytest
 
 from datetime import datetime
 
-from converter.event import Event
-from converter.data.bm import BowelMovementData
+from event import Event
+from data.bm import BowelMovementData
 
 
 def test_bm_minimal():

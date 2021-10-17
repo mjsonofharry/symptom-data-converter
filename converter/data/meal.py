@@ -4,7 +4,7 @@ from typing import List, Tuple, Optional
 from data.base import EventData
 
 from parsec import *
-from converter.helpers import *
+from helpers import *
 
 
 def ingredient_with_quantity():

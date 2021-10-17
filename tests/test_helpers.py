@@ -3,7 +3,7 @@ import pytest
 from datetime import datetime, timedelta
 
 from parsec import *
-from converter.helpers import *
+from helpers import *
 
 
 def test_date_and_time():
