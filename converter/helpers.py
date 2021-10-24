@@ -30,7 +30,7 @@ def end_of_line():
 
 def empty():
     """Parse empty string."""
-    return string("") ^ end_of_string() ^ end_of_line()
+    return string("") ^ end_of_string()
 
 
 def until_end_of_line():
@@ -58,21 +58,6 @@ def bracketed():
 def delimited_sequence(p: Parser):
     """Parse a sequence of delimited parsers until the end of the string."""
     return many1(p << (delimiter() ^ end_of_string()))
-
-
-def date_and_time():
-    """Parse a date and time in the format of "MM/DD/YYYY, HH:MM"."""
-
-    @generate
-    def p():
-        month = yield number(2) << string("/")
-        day = yield number(2) << string("/")
-        year = yield number(4) << delimiter()
-        hour = yield number(2) << string(":")
-        minute = yield number(2) << optional(delimiter())
-        return datetime(year=year, month=month, day=day, hour=hour, minute=minute)
-
-    return p
 
 
 def time_elapsed():
@@ -108,3 +93,17 @@ def key_value(key: str, p: Parser):
 def event_notes():
     """Parse notes."""
     return string('"Notes:') >> spaces() >> regex(r'[^\\"]+') << string('"')
+
+
+def row_end():
+    return event_notes() ^ end_of_line() ^ end_of_string()
+
+
+def until_row_end():
+    return (many(regex(r'[^\\"]+')).parsecmap(",".join) + event_notes()).parsecmap(
+        ",".join
+    ) ^ until_end_of_line()
+
+
+def everything():
+    return many(any()).parsecapp("".join)
