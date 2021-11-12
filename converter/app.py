@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 import csv
 
 from event import Event
+import helpers
 
 
 def main():
@@ -14,18 +15,11 @@ def main():
     output_path: str = args.output
 
     with open(input_path, "r") as fin, open(output_path, "w") as fout:
-        reader = csv.reader(
-            fin,
-            quotechar='"',
-            delimiter=",",
-            quoting=csv.QUOTE_ALL,
-            skipinitialspace=True,
-        )
+        reader = helpers.get_csv_reader(csvfile=fin)
         for row in reader:
             if not row:
                 continue
             print(row)
-            # event = Event.parse(data=row)
             event = Event.process(data=row)
             if not event:
                 continue

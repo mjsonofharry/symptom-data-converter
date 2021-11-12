@@ -1,26 +1,18 @@
 from dataclasses import dataclass
+from typing import List, Optional
 
 from data.base import EventData
-
-from parsec import *
-from helpers import *
+import helpers
 
 
 @dataclass(frozen=True)
 class BowelMovementData(EventData):
-    intensity: int
+    intensity: Optional[int]
 
     @classmethod
-    def Parser(cls) -> Parser:
-        @generate
-        def p():
-            _ = yield string("Bowel Movement") << maybe_more()
-            intensity = yield optional(key_value("Intensity", number())) << maybe_more()
-            notes = yield optional(event_notes())
-            return cls(intensity=intensity, notes=notes)
-
-        return p
-
-    @classmethod
-    def parse(cls, data: str) -> "BowelMovementData":
-        return cls.Parser().parse(text=data)
+    def process(cls, data: List[str]):
+        if not data:
+            return cls(_data=data, intensity=None)
+        _ = data.pop(0) # Bowel Movement
+        intensity = helpers.parse_intensity(data.pop(0)) if data else None
+        return cls(_data=data, intensity=intensity)

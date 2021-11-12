@@ -1,40 +1,17 @@
+import dataclasses
 from dataclasses import dataclass
-import functools
-from typing import List, Tuple
+from datetime import datetime, timedelta
+from typing import List, Tuple, Optional
 
 from data.base import EventData
-
-from parsec import *
-from helpers import *
-
-
-def intensity_parser() -> Parser:
-    @generate
-    def p():
-        intensity = yield key_value("Intensity", number()) ^ (
-            everything().parsecapp(none)
-        )
-        return intensity
-
-    return p
-
-
-def duration_parser() -> Parser:
-    @generate
-    def p():
-        duration = yield key_value("Duration:", time_elapsed()) ^ (
-            everything().parsecapp(none)
-        )
-        return duration
-
-    return p
+import helpers
 
 
 @dataclass(frozen=True)
 class Symptom:
     name: str
-    intensity: int
-    duration: timedelta
+    intensity: Optional[int] = None
+    duration: Optional[timedelta] = None
 
 
 @dataclass(frozen=True)
@@ -42,40 +19,19 @@ class SymptomData(EventData):
     symptoms: List[Symptom]
 
     @classmethod
-    def process(cls, data: List[str]) -> "SymptomData":
-        def build_symptoms(acc: Tuple[list, dict], x: str):
-            result, partial = acc
-            intensity = intensity_parser().parse(text=x)
-            if intensity:
-                partial["intensity"] = intensity
-                return result, partial
-            duration = duration_parser().parse(text=x)
-            if duration:
-                partial["duration"] = duration
-            result.append(Symptom(**partial))
-            partial = dict(name=x)
-            return result, partial
-
-
-        functools.reduce(build_symptoms, data[1:], ([], dict(name=data[0])))
-
+    def process(cls, data: List[str]):
+        if not data:
+            return cls(_data=data, symptoms=[])
         symptoms: List[Symptom] = []
-        acc = dict()
+        next_symptom: Optional[Symptom] = Symptom(name=data.pop(0))
         for col in data:
-            updated = False
-            if "name" not in acc:
-                acc["name"] = col
-                updated = True
-            if not updated:
-                intensity = intensity_parser().parse(text=col)
-                if intensity:
-                    acc["intensity"] = intensity
-                    updated = True
-            if not updated:
-                duration = duration_parser().parse(text=col)
-                if duration:
-                    acc["duration"] = duration
-                    updated = True
-            symptoms.append(Symptom(**acc))
-            acc = dict()
-            updated = False
+            if col.startswith("Intensity:"):
+                intensity = helpers.parse_intensity(col)
+                next_symptom = dataclasses.replace(next_symptom, intensity=intensity)
+            elif col.startswith("Duration"):
+                duration = helpers.parse_duration(col)
+                next_symptom = dataclasses.replace(next_symptom, duration=duration)
+            else:
+                symptoms.append(next_symptom)
+                next_symptom = Symptom(name=col)
+        return cls(_data=data, symptoms=[*symptoms, next_symptom])
