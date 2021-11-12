@@ -1,23 +1,14 @@
 from dataclasses import dataclass
-from typing import Optional, Type
-
-from parsec import *
-from helpers import *
+from typing import List, Type
 
 
 @dataclass(frozen=True)
 class EventData:
-    notes: Optional[str]
+    _data: List[str]
 
     @classmethod
-    def Parser(cls) -> Parser:
-        @generate
-        def p():
-            _ = yield optional(many(until_delimiter()))
-            notes = yield optional(event_notes())
-            return cls(notes=notes)
-        return p
+    def from_cols(cls, data: List[str]) -> Type["EventData"]:
+        raise NotImplementedError()
 
-    @classmethod
-    def parse(cls, data: str) -> Type["EventData"]:
-        return cls.Parser().parse(text=data)
+    def to_dicts(self) -> List[dict]:
+        raise NotImplementedError()

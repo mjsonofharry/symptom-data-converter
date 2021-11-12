@@ -1,110 +1,39 @@
+import csv
 from datetime import datetime, timedelta
-from typing import Optional
-
-from parsec import *
+from typing import Iterable, List, Optional
 
 
-def delimiter():
-    """Parse the delimiter character."""
-    return string(",") << spaces()
+def get_csv_reader(csvfile: Iterable[str]):
+    return csv.reader(
+        csvfile,
+        quotechar='"',
+        delimiter=",",
+        quoting=csv.QUOTE_ALL,
+        skipinitialspace=True,
+    )
 
 
-def not_delimiter():
-    return regex(r"[^,]+")
+def parse_csv_sample(csv_sample: str) -> List[str]:
+    reader = get_csv_reader(csvfile=[csv_sample])
+    return [row for row in reader][0]
 
 
-def until_delimiter():
-    """Parse text until the delimiter character."""
-    return not_delimiter() << delimiter()
+DATE_FORMAT = "%m/%d/%Y"
+TIME_FORMAT = "%H:%M"
 
 
-def end_of_string():
-    """Parse the end of a string."""
-    return regex(r"$")
+def parse_timestamp(date_string: str, time_string: str):
+    return datetime.strptime(
+        f"{date_string}T{time_string}", f"{DATE_FORMAT}T{TIME_FORMAT}"
+    )
 
 
-def end_of_line():
-    """Parse the end of a line."""
-    return regex(r"[\n]")
+def parse_intensity(intensity_str: str) -> int:
+    _, intensity_value = intensity_str.split("Intensity:", 1)
+    return int(intensity_value.strip())
 
 
-def empty():
-    """Parse empty string."""
-    return string("") ^ end_of_string() ^ end_of_line()
-
-
-def until_end_of_line():
-    """Parse text the end of a line."""
-    return regex(r"[^\n]+")
-
-
-def number(digits: Optional[int] = None):
-    """Parse a positive integer."""
-    if not digits:
-        return many1(digit()).parsecmap("".join).parsecmap(int)
-    return count(digit(), digits).parsecmap("".join).parsecmap(int)
-
-
-def quoted():
-    """Parse text between double-quotes."""
-    return string('"') >> regex(r'[^\\"]+') << string('"')
-
-
-def bracketed():
-    """Parse text between square brackets."""
-    return string("[") >> regex(r"[^\]]+") << string("]")
-
-
-def delimited_sequence(p: Parser):
-    """Parse a sequence of delimited parsers until the end of the string."""
-    return many1(p << (delimiter() ^ end_of_string()))
-
-
-def date_and_time():
-    """Parse a date and time in the format of "MM/DD/YYYY, HH:MM"."""
-
-    @generate
-    def p():
-        month = yield number(2) << string("/")
-        day = yield number(2) << string("/")
-        year = yield number(4) << delimiter()
-        hour = yield number(2) << string(":")
-        minute = yield number(2) << optional(delimiter())
-        return datetime(year=year, month=month, day=day, hour=hour, minute=minute)
-
-    return p
-
-
-def time_elapsed():
-    """Parse a duration in the format of "HH:MM"."""
-
-    @generate
-    def p():
-        hours = yield number() << string(":")
-        minutes = yield number()
-        return timedelta(hours=hours, minutes=minutes)
-
-    return p
-
-
-none = lambda _: None
-
-
-def optional(p: Parser):
-    """Parse something if it exists or else yield none."""
-    return p ^ empty().parsecmap(none)
-
-
-def maybe_more():
-    """Parse the next delimiter if it exists."""
-    return optional(delimiter()).parsecmap(none)
-
-
-def key_value(key: str, p: Parser):
-    """Parse something in the format of KEY:VALUE."""
-    return string(key) >> string(":") >> spaces() >> p
-
-
-def event_notes():
-    """Parse notes."""
-    return string('"Notes:') >> spaces() >> regex(r'[^\\"]+') << string('"')
+def parse_duration(duration_str: str):
+    _, duration_value = duration_str.split("Duration:", 1)
+    hours, minutes = duration_value.strip().split(":")
+    return timedelta(hours=int(hours), minutes=int(minutes))

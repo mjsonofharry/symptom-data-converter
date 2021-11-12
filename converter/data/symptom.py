@@ -1,38 +1,17 @@
+import dataclasses
 from dataclasses import dataclass
-from typing import List
+from datetime import datetime, timedelta
+from typing import List, Tuple, Optional
 
 from data.base import EventData
-
-from parsec import *
-from helpers import *
+import helpers
 
 
 @dataclass(frozen=True)
 class Symptom:
     name: str
-    intensity: int
-    duration: timedelta
-
-    @classmethod
-    def Parser(cls) -> Parser:
-        @generate
-        def p():
-            name = yield until_delimiter()
-            intensity = yield key_value("Intensity", number()) << maybe_more()
-            duration = (
-                yield optional(key_value("Duration", time_elapsed())) << maybe_more()
-            )
-            return Symptom(
-                name=name,
-                intensity=intensity,
-                duration=duration,
-            )
-
-        return p
-
-    @classmethod
-    def parse(cls, data: str) -> "Symptom":
-        return cls.Parser().parse(text=data)
+    intensity: Optional[int] = None
+    duration: Optional[timedelta] = None
 
 
 @dataclass(frozen=True)
@@ -40,15 +19,29 @@ class SymptomData(EventData):
     symptoms: List[Symptom]
 
     @classmethod
-    def Parser(cls) -> Parser:
-        @generate
-        def p():
-            symptoms = yield many1(Symptom.Parser())
-            notes = yield optional(event_notes())
-            return cls(symptoms=symptoms, notes=notes)
+    def from_cols(cls, data: List[str]):
+        if not data:
+            return cls(_data=data, symptoms=[])
+        symptoms: List[Symptom] = []
+        next_symptom: Optional[Symptom] = Symptom(name=data.pop(0))
+        for col in data:
+            if col.startswith("Intensity:"):
+                intensity = helpers.parse_intensity(col)
+                next_symptom = dataclasses.replace(next_symptom, intensity=intensity)
+            elif col.startswith("Duration"):
+                duration = helpers.parse_duration(col)
+                next_symptom = dataclasses.replace(next_symptom, duration=duration)
+            else:
+                symptoms.append(next_symptom)
+                next_symptom = Symptom(name=col)
+        return cls(_data=data, symptoms=[*symptoms, next_symptom])
 
-        return p
-
-    @classmethod
-    def parse(cls, data: str) -> "SymptomData":
-        return cls.Parser().parse(text=data)
+    def to_dicts(self):
+        return [
+            dict(
+                name=symptom.name,
+                intensity=symptom.intensity,
+                duration_seconds=symptom.duration.seconds if symptom.duration else None,
+            )
+            for symptom in self.symptoms
+        ]

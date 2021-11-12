@@ -1,13 +1,13 @@
 from dataclasses import dataclass
+import dataclasses
 from datetime import datetime
-from typing import Optional, Type
+from typing import List, Optional, Type
+import uuid
 
 from data.base import EventData
 from data.symptom import SymptomData
 from data.bm import BowelMovementData
-
-from parsec import *
-from helpers import *
+import helpers
 
 
 @dataclass(frozen=True)
@@ -15,29 +15,43 @@ class Event:
     timestamp: datetime
     kind: str
     data: Optional[EventData]
+    notes: Optional[str]
 
     @staticmethod
     def kind_to_subclass(kind: str) -> Optional[Type["EventData"]]:
         return {
             "Symptom": SymptomData,
             "Bowel Movement": BowelMovementData,
-        }.get(kind, EventData)
+        }.get(kind)
 
     @classmethod
-    def Parser(cls) -> Parser:
-        @generate
-        def p():
-            timestamp = yield date_and_time()
-            kind = yield until_delimiter() ^ until_end_of_line()
-            event_data = yield optional(until_end_of_line())
-            event_data_cls = Event.kind_to_subclass(kind)
-            if not event_data_cls:
-                return None
-            data = event_data_cls.parse(data=event_data) if event_data else None
-            return cls(timestamp=timestamp, kind=kind, data=data)
+    def from_cols(cls, data: List[str]) -> Optional["Event"]:
+        date_string: str = data.pop(0)
+        time_string: str = data.pop(0)
+        timestamp: datetime = helpers.parse_timestamp(
+            date_string=date_string, time_string=time_string
+        )
+        kind: str = data.pop(0)
+        event_data_cls: Optional[Type[EventData]] = cls.kind_to_subclass(kind)
+        if not event_data_cls:
+            return None
+        notes: Optional[str] = (
+            data.pop(-1).split(":", 1)[1].strip()
+            if data and data[-1].startswith("Notes:")
+            else None
+        )
+        event_data = event_data_cls.from_cols(data=data)
+        return cls(timestamp=timestamp, kind=kind, data=event_data, notes=notes)
 
-        return p
-
-    @classmethod
-    def parse(cls, data: str) -> Optional["Event"]:
-        return cls.Parser().parse(text=data)
+    def to_dicts(self):
+        event_uuid = uuid.uuid4()
+        return [
+            dict(
+                event_uuid=str(event_uuid),
+                timestamp=self.timestamp.isoformat(),
+                kind=self.kind,
+                notes=self.notes,
+                **data_dict
+            )
+            for data_dict in self.data.to_dicts()
+        ]

@@ -1,7 +1,8 @@
 from argparse import ArgumentParser
-import dataclasses
+import json
 
 from event import Event
+import helpers
 
 
 def main():
@@ -14,16 +15,16 @@ def main():
     output_path: str = args.output
 
     with open(input_path, "r") as fin, open(output_path, "w") as fout:
-        for row in fin.readlines():
-            row = row.strip()
+        reader = helpers.get_csv_reader(csvfile=fin)
+        output = []
+        for row in reader:
             if not row:
                 continue
-            print(row)
-            event = Event.parse(data=row)
+            event = Event.from_cols(data=row)
             if not event:
                 continue
-            # fout.write(event)
-            # fout.write("\n")
+            output += event.to_dicts()
+        fout.write(json.dumps(output))
 
 
 if __name__ == "__main__":
