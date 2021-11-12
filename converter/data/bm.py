@@ -16,3 +16,6 @@ class BowelMovementData(EventData):
         _ = data.pop(0)  # Bowel Movement
         intensity = helpers.parse_intensity(data.pop(0)) if data else None
         return cls(_data=data, intensity=intensity)
+
+    def to_dicts(self):
+        return [dict(intensity=self.intensity)]

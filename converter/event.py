@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import dataclasses
 from datetime import datetime
 from typing import List, Optional, Type
+import uuid
 
 from data.base import EventData
 from data.symptom import SymptomData
@@ -42,5 +43,15 @@ class Event:
         event_data = event_data_cls.from_cols(data=data)
         return cls(timestamp=timestamp, kind=kind, data=event_data, notes=notes)
 
-    def to_json(self):
-        pass
+    def to_dicts(self):
+        event_uuid = uuid.uuid4()
+        return [
+            dict(
+                event_uuid=str(event_uuid),
+                timestamp=self.timestamp.isoformat(),
+                kind=self.kind,
+                notes=self.notes,
+                **data_dict
+            )
+            for data_dict in self.data.to_dicts()
+        ]

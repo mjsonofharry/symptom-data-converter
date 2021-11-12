@@ -138,3 +138,6 @@ dmypy.json
 
 # Visual Studio Code settings
 .vscode
+
+# Sample data
+sample_data/

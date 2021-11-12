@@ -35,3 +35,13 @@ class SymptomData(EventData):
                 symptoms.append(next_symptom)
                 next_symptom = Symptom(name=col)
         return cls(_data=data, symptoms=[*symptoms, next_symptom])
+
+    def to_dicts(self):
+        return [
+            dict(
+                name=symptom.name,
+                intensity=symptom.intensity,
+                duration_seconds=symptom.duration.seconds if symptom.duration else None,
+            )
+            for symptom in self.symptoms
+        ]
