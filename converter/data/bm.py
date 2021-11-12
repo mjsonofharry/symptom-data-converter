@@ -10,9 +10,9 @@ class BowelMovementData(EventData):
     intensity: Optional[int]
 
     @classmethod
-    def process(cls, data: List[str]):
+    def from_cols(cls, data: List[str]):
         if not data:
             return cls(_data=data, intensity=None)
-        _ = data.pop(0) # Bowel Movement
+        _ = data.pop(0)  # Bowel Movement
         intensity = helpers.parse_intensity(data.pop(0)) if data else None
         return cls(_data=data, intensity=intensity)

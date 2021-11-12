@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import dataclasses
 from datetime import datetime
 from typing import List, Optional, Type
 
@@ -23,7 +24,7 @@ class Event:
         }.get(kind)
 
     @classmethod
-    def process(cls, data: List[str]) -> Optional["Event"]:
+    def from_cols(cls, data: List[str]) -> Optional["Event"]:
         date_string: str = data.pop(0)
         time_string: str = data.pop(0)
         timestamp: datetime = helpers.parse_timestamp(
@@ -38,5 +39,8 @@ class Event:
             if data and data[-1].startswith("Notes:")
             else None
         )
-        event_data = event_data_cls.process(data=data)
+        event_data = event_data_cls.from_cols(data=data)
         return cls(timestamp=timestamp, kind=kind, data=event_data, notes=notes)
+
+    def to_json(self):
+        pass

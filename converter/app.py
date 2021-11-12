@@ -20,7 +20,7 @@ def main():
             if not row:
                 continue
             print(row)
-            event = Event.process(data=row)
+            event = Event.from_cols(data=row)
             if not event:
                 continue
             # fout.write(event)

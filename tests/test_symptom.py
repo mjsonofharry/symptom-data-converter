@@ -11,7 +11,7 @@ import helpers
 
 def test_minimal():
     sample = """01/01/2021, 09:00, Symptom, My Symptom, Intensity: 5"""
-    event = Event.process(data=helpers.parse_csv_sample(sample))
+    event = Event.from_cols(data=helpers.parse_csv_sample(sample))
     assert event.timestamp == datetime(year=2021, month=1, day=1, hour=9, minute=0)
     data = event.data
     assert event.notes is None
@@ -27,7 +27,7 @@ def test_minimal():
 
 def test_with_duration():
     sample = """01/01/2021, 09:00, Symptom, My Symptom, Intensity: 5, Duration: 2:00"""
-    event = Event.process(data=helpers.parse_csv_sample(sample))
+    event = Event.from_cols(data=helpers.parse_csv_sample(sample))
     assert event.timestamp == datetime(year=2021, month=1, day=1, hour=9, minute=0)
     data = event.data
     assert event.notes is None
@@ -43,7 +43,7 @@ def test_with_duration():
 
 def test_with_notes():
     sample = '''01/01/2021, 09:00, Symptom, My Symptom, Intensity: 5, "Notes: I had a cool test symptom"'''
-    event = Event.process(data=helpers.parse_csv_sample(sample))
+    event = Event.from_cols(data=helpers.parse_csv_sample(sample))
     assert event.timestamp == datetime(year=2021, month=1, day=1, hour=9, minute=0)
     data = event.data
     assert event.notes == "I had a cool test symptom"
@@ -59,7 +59,7 @@ def test_with_notes():
 
 def test_with_duration_and_notes():
     sample = '''01/01/2021, 09:00, Symptom, My Symptom, Intensity: 5, Duration: 2:00, "Notes: I had a cool test symptom"'''
-    event = Event.process(data=helpers.parse_csv_sample(sample))
+    event = Event.from_cols(data=helpers.parse_csv_sample(sample))
     assert event.timestamp == datetime(year=2021, month=1, day=1, hour=9, minute=0)
     data = event.data
     assert event.notes == "I had a cool test symptom"
@@ -75,7 +75,7 @@ def test_with_duration_and_notes():
 
 def test_multiple_minimal():
     sample = """01/01/2021, 09:00, Symptom, My Symptom, Intensity: 5, My Other Symptom, Intensity: 3"""
-    event = Event.process(data=helpers.parse_csv_sample(sample))
+    event = Event.from_cols(data=helpers.parse_csv_sample(sample))
     assert event.timestamp == datetime(year=2021, month=1, day=1, hour=9, minute=0)
     data = event.data
     assert event.notes is None
@@ -95,7 +95,7 @@ def test_multiple_minimal():
 
 def test_multiple_with_duration():
     sample = """01/01/2021, 09:00, Symptom, My Symptom, Intensity: 5, Duration: 2:00, My Other Symptom, Intensity: 3, Duration: 0:10"""
-    event = Event.process(data=helpers.parse_csv_sample(sample))
+    event = Event.from_cols(data=helpers.parse_csv_sample(sample))
     assert event.timestamp == datetime(year=2021, month=1, day=1, hour=9, minute=0)
     data = event.data
     assert event.notes is None
@@ -115,7 +115,7 @@ def test_multiple_with_duration():
 
 def test_multiple_with_notes():
     sample = '''01/01/2021, 09:00, Symptom, My Symptom, Intensity: 5, My Other Symptom, Intensity: 3, "Notes: I had a couple of really cool test symptoms"'''
-    event = Event.process(data=helpers.parse_csv_sample(sample))
+    event = Event.from_cols(data=helpers.parse_csv_sample(sample))
     assert event.timestamp == datetime(year=2021, month=1, day=1, hour=9, minute=0)
     data = event.data
     assert event.notes == "I had a couple of really cool test symptoms"
@@ -135,7 +135,7 @@ def test_multiple_with_notes():
 
 def test_multiple_with_duration_and_notes():
     sample = '''01/01/2021, 09:00, Symptom, My Symptom, Intensity: 5, Duration: 2:00, My Other Symptom, Intensity: 3, Duration: 0:10, "Notes: I had a couple of really cool test symptoms"'''
-    event = Event.process(data=helpers.parse_csv_sample(sample))
+    event = Event.from_cols(data=helpers.parse_csv_sample(sample))
     assert event.timestamp == datetime(year=2021, month=1, day=1, hour=9, minute=0)
     data = event.data
     assert event.notes == "I had a couple of really cool test symptoms"

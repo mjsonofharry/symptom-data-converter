@@ -19,7 +19,7 @@ class SymptomData(EventData):
     symptoms: List[Symptom]
 
     @classmethod
-    def process(cls, data: List[str]):
+    def from_cols(cls, data: List[str]):
         if not data:
             return cls(_data=data, symptoms=[])
         symptoms: List[Symptom] = []

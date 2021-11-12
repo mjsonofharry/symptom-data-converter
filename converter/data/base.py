@@ -7,5 +7,5 @@ class EventData:
     _data: List[str]
 
     @classmethod
-    def process(cls, data: List[str]) -> Type["EventData"]:
+    def from_cols(cls, data: List[str]) -> Type["EventData"]:
         return cls(_data=data)
