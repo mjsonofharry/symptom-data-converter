@@ -1,4 +1,4 @@
-# my-symptoms-converter
+# Symptom Data Converter
 
 Convert exported symptom data from CSV to JSON.
 
