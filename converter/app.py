@@ -23,7 +23,7 @@ def main():
             event = Event.from_cols(data=row)
             if not event:
                 continue
-            output.append(event.to_dicts())
+            output += event.to_dicts()
         fout.write(json.dumps(output))
 
 
